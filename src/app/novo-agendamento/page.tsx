@@ -1,6 +1,18 @@
 "use client";
 
-import { Box, Button, Card, Stack, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  Card,
+  Stack,
+  TextField,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -31,6 +43,7 @@ type FormData = z.infer<typeof agendamentoSchema>;
 
 export default function NovoAgendamentoPage() {
   const router = useRouter();
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
 
   const {
     control,
@@ -54,124 +67,147 @@ export default function NovoAgendamentoPage() {
       horario: dayjs(data.horario).format("HH:mm"),
     };
 
-    await createAgendamento(payload);
+    const result = await createAgendamento(payload);
+    if (!result) {
+      setShowErrorDialog(true); // Mostra o Dialog se falhar
+      return;
+    }
+
     router.push("/");
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Typography variant="h4" gutterBottom color="text.primary">
-        Novo Agendamento
-      </Typography>
+    <>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Typography variant="h4" gutterBottom color="text.primary">
+          Novo Agendamento
+        </Typography>
 
-      <Card sx={{ p: 4, mt: 2, borderRadius: 4, maxWidth: 1000 }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={3}>
-            <TextField
-              label="Motorista"
-              {...register("motorista")}
-              error={!!errors.motorista}
-              helperText={errors.motorista?.message}
-            />
+        <Card sx={{ p: 4, mt: 2, borderRadius: 4, maxWidth: 1000 }}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={3}>
+              <TextField
+                label="Motorista"
+                {...register("motorista")}
+                error={!!errors.motorista}
+                helperText={errors.motorista?.message}
+              />
 
-            <Controller
-              name="placa"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label="Placa"
-                  value={field.value}
-                  onChange={(e) => {
-                    let value = e.target.value
-                      .toUpperCase()
-                      .replace(/[^A-Z0-9]/g, "");
+              <Controller
+                name="placa"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    label="Placa"
+                    value={field.value}
+                    onChange={(e) => {
+                      let value = e.target.value
+                        .toUpperCase()
+                        .replace(/[^A-Z0-9]/g, "");
 
-                    value = value.slice(0, 7);
+                      value = value.slice(0, 7);
 
-                    field.onChange(value);
-                  }}
-                  inputProps={{ maxLength: 7 }}
-                  error={!!errors.placa}
-                  helperText={errors.placa?.message ?? "Ex: ABC1234 ou ABC1D23"}
-                />
-              )}
-            />
+                      field.onChange(value);
+                    }}
+                    inputProps={{ maxLength: 7 }}
+                    error={!!errors.placa}
+                    helperText={
+                      errors.placa?.message ?? "Ex: ABC1234 ou ABC1D23"
+                    }
+                  />
+                )}
+              />
 
-            <Controller
-              name="cpf"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label="CPF"
-                  value={field.value}
-                  onChange={(e) => {
-                    let value = e.target.value.replace(/\D/g, "");
-                    value = value
-                      .replace(/(\d{3})(\d)/, "$1.$2")
-                      .replace(/(\d{3})(\d)/, "$1.$2")
-                      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-                    field.onChange(value);
-                  }}
-                  error={!!errors.cpf}
-                  helperText={errors.cpf?.message}
-                />
-              )}
-            />
+              <Controller
+                name="cpf"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    label="CPF"
+                    value={field.value}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/\D/g, "");
+                      value = value
+                        .replace(/(\d{3})(\d)/, "$1.$2")
+                        .replace(/(\d{3})(\d)/, "$1.$2")
+                        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+                      field.onChange(value);
+                    }}
+                    error={!!errors.cpf}
+                    helperText={errors.cpf?.message}
+                  />
+                )}
+              />
 
-            <Controller
-              name="nascimento"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  label="Data de Nascimento"
-                  value={field.value}
-                  onChange={(e) => {
-                    let value = e.target.value.replace(/\D/g, "");
-                    value = value
-                      .replace(/(\d{2})(\d)/, "$1/$2")
-                      .replace(/(\d{2})(\d)/, "$1/$2")
-                      .replace(/(\d{4})(\d)/, "$1");
-                    field.onChange(value);
-                  }}
-                  error={!!errors.nascimento}
-                  helperText={errors.nascimento?.message}
-                />
-              )}
-            />
+              <Controller
+                name="nascimento"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    label="Data de Nascimento"
+                    value={field.value}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/\D/g, "");
+                      value = value
+                        .replace(/(\d{2})(\d)/, "$1/$2")
+                        .replace(/(\d{2})(\d)/, "$1/$2")
+                        .replace(/(\d{4})(\d)/, "$1");
+                      field.onChange(value);
+                    }}
+                    error={!!errors.nascimento}
+                    helperText={errors.nascimento?.message}
+                  />
+                )}
+              />
 
-            <Controller
-              name="horario"
-              control={control}
-              render={({ field }) => (
-                <TimePicker
-                  label="Horário"
-                  value={field.value}
-                  onChange={field.onChange}
-                  slotProps={{
-                    textField: {
-                      error: !!errors.horario,
-                      helperText: errors.horario?.message as string,
-                    },
-                  }}
-                />
-              )}
-            />
+              <Controller
+                name="horario"
+                control={control}
+                render={({ field }) => (
+                  <TimePicker
+                    label="Horário"
+                    value={field.value}
+                    onChange={field.onChange}
+                    slotProps={{
+                      textField: {
+                        error: !!errors.horario,
+                        helperText: errors.horario?.message as string,
+                      },
+                    }}
+                  />
+                )}
+              />
 
-            <Box display="flex" justifyContent="space-between" mt={2}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => router.back()}
-              >
-                Voltar
-              </Button>
-              <Button type="submit" variant="contained">
-                Salvar
-              </Button>
-            </Box>
-          </Stack>
-        </form>
-      </Card>
-    </LocalizationProvider>
+              <Box display="flex" justifyContent="space-between" mt={2}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => router.back()}
+                >
+                  Voltar
+                </Button>
+                <Button type="submit" variant="contained">
+                  Salvar
+                </Button>
+              </Box>
+            </Stack>
+          </form>
+        </Card>
+      </LocalizationProvider>
+      <Dialog open={showErrorDialog}>
+        <DialogTitle>Sistema em manutenção</DialogTitle>
+        <DialogContent>
+          <Typography>
+            No momento não foi possível realizar o agendamento. Tente novamente
+            mais tarde.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowErrorDialog(false)} autoFocus>
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

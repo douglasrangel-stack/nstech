@@ -28,25 +28,25 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function AgendamentosPage() {
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedAgendamento, setSelectedAgendamento] =
     useState<Agendamento | null>(null);
 
   useEffect(() => {
+    const carregarAgendamentos = async () => {
+      const data = await fetchAgendamentos();
+      if (!data) {
+        setShowErrorDialog(true);
+      } else {
+        setAgendamentos(data);
+      }
+      setLoading(false);
+    };
+
     carregarAgendamentos();
   }, []);
-
-  const carregarAgendamentos = async () => {
-    try {
-      const data = await fetchAgendamentos();
-      setAgendamentos(data);
-    } catch (err) {
-      console.error("Erro ao carregar agendamentos:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async () => {
     if (selectedAgendamento) {
@@ -168,6 +168,20 @@ export default function AgendamentosPage() {
           </Button>
           <Button onClick={handleDelete} color="error" autoFocus>
             Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={showErrorDialog}>
+        <DialogTitle>Sistema em manutenção</DialogTitle>
+        <DialogContent>
+          <Typography>
+            No momento não foi possível carregar os dados. Tente novamente mais
+            tarde.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowErrorDialog(false)} autoFocus>
+            Fechar
           </Button>
         </DialogActions>
       </Dialog>

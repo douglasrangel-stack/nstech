@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
+import { Box } from "@mui/material";
+import Sidebar from "../components/sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,19 +27,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <header>
-          <nav>
-            <ul>
-              <li>
-                <Link href="/">Lista de Agendamentos</Link>
-              </li>
-              <li>
-                <Link href="/new">Novo Agendamento</Link>
-              </li>
-            </ul>
-          </nav>
-        </header>
-        {children}
+        <Box
+          sx={{
+            width: "100vw",
+            bgcolor: "#f5f5f5",
+            minHeight: "100vh",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              p: 4,
+            }}
+          >
+            <Sidebar />
+            <Box sx={{ flex: 1 }}>{children}</Box>
+          </Box>
+        </Box>
       </body>
     </html>
   );

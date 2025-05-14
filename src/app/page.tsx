@@ -1,22 +1,56 @@
-import moment from 'moment';
+"use client";
 
-export default function TruckScheduleList() {
-  const schedules = [
-    { id: 1, truck: 'AAA1234', time: '08:00 AM' },
-    { id: 2, truck: 'BBB2345', time: '10:00 AM' },
-    { id: 3, truck: 'CCC3456', time: '02:00 PM' },
-  ];
+import { useEffect, useState } from "react";
+import { fetchAgendamentos } from "../services/api";
+import {
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Typography,
+  Paper,
+} from "@mui/material";
+
+export default function AgendamentosPage() {
+  const [agendamentos, setAgendamentos] = useState([]);
+
+  useEffect(() => {
+    fetchAgendamentos().then(setAgendamentos);
+  }, []);
 
   return (
-    <div>
-      <h1>Lista de Agendamentos</h1>
-      <ul>
-        {schedules.map(schedule => (
-          <li key={schedule.id}>
-            {schedule.truck} - {moment(schedule.time, 'hh:mm A').format('HH:mm')}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Typography variant="h4" color="text.primary" gutterBottom>
+        Agendamentos
+      </Typography>
+      <TableContainer
+        component={Paper}
+        elevation={1}
+        sx={{ borderRadius: 6, p: 2, maxWidth: 1000 }}
+      >
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold", py: 2 }}>
+                Motorista
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", py: 2 }}>Placa</TableCell>
+              <TableCell sx={{ fontWeight: "bold", py: 2 }}>Horário</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {agendamentos.map((item: any) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.motorista}</TableCell>
+                <TableCell>{item.placa}</TableCell>
+                <TableCell>{item.horario}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 }

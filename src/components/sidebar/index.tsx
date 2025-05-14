@@ -2,6 +2,7 @@
 
 import {
   List,
+  ListItemButton,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -18,35 +19,41 @@ export default function Sidebar() {
   return (
     <Paper sx={{ width: 300, mt: 7, mr: 4, p: 2, borderRadius: 6 }}>
       <List disablePadding>
-        <ListItem
-          component={Link}
-          href="/"
-          selected={pathname === "/"}
-          sx={{
-            bgcolor: pathname === "/" ? "action.hover" : "transparent",
-            borderRadius: 2,
-          }}
-        >
-          <ListItemIcon>
-            <CalendarMonthIcon />
-          </ListItemIcon>
-          <ListItemText primary="Agendamentos" />
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            href="/"
+            selected={pathname === "/"}
+            sx={{
+              bgcolor: pathname === "/" ? "action.hover" : "transparent",
+              borderRadius: 2,
+            }}
+          >
+            <ListItemIcon>
+              <CalendarMonthIcon />
+            </ListItemIcon>
+            <ListItemText primary="Agendamentos" />
+          </ListItemButton>
         </ListItem>
 
-        <ListItem
-          component={Link}
-          href="/novo-agendamento"
-          selected={pathname === "/novo-agendamento"}
-          sx={{
-            bgcolor:
-              pathname === "/novo-agendamento" ? "action.hover" : "transparent",
-            borderRadius: 2,
-          }}
-        >
-          <ListItemIcon>
-            <AddIcon />
-          </ListItemIcon>
-          <ListItemText primary="Novo Agendamento" />
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            href="/novo-agendamento"
+            selected={pathname === "/novo-agendamento"}
+            sx={{
+              bgcolor:
+                pathname === "/novo-agendamento"
+                  ? "action.hover"
+                  : "transparent",
+              borderRadius: 2,
+            }}
+          >
+            <ListItemIcon>
+              <AddIcon />
+            </ListItemIcon>
+            <ListItemText primary="Novo Agendamento" />
+          </ListItemButton>
         </ListItem>
       </List>
     </Paper>

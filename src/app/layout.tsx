@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Box } from "@mui/material";
-import Sidebar from "../components/sidebar";
+import Sidebar from "@/components/sidebar";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +29,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Header />
         <Box
           sx={{
             width: "100vw",
             bgcolor: "#f5f5f5",
-            minHeight: "100vh",
+            p: 4,
+            minHeight: "90vh",
           }}
         >
           <Box
@@ -45,6 +49,7 @@ export default function RootLayout({
             <Box sx={{ flex: 1 }}>{children}</Box>
           </Box>
         </Box>
+        <Footer />
       </body>
     </html>
   );

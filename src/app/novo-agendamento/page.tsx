@@ -14,10 +14,17 @@ import { createAgendamento } from "@/services/api";
 
 const agendamentoSchema = z.object({
   motorista: z.string().min(1, "Informe o nome do motorista"),
-  placa: z.string().min(1, "Informe a placa"),
+  placa: z
+    .string()
+    .min(7, "Informe a placa")
+    .regex(/^([A-Z]{3}[0-9]{4}|[A-Z]{3}[0-9][A-Z][0-9]{2})$/, {
+      message: "Placa inválida. Use ABC1234 ou ABC1D23",
+    }),
   horario: z.any().refine((value) => dayjs(value).isValid(), {
     message: "Informe um horário válido",
   }),
+  cpf: z.string().min(14, "Informe um CPF válido"),
+  nascimento: z.string().min(10, "Informe uma data válida"),
 });
 
 type FormData = z.infer<typeof agendamentoSchema>;
@@ -36,6 +43,8 @@ export default function NovoAgendamentoPage() {
       motorista: "",
       placa: "",
       horario: null,
+      cpf: "",
+      nascimento: "",
     },
   });
 
@@ -46,7 +55,6 @@ export default function NovoAgendamentoPage() {
     };
 
     await createAgendamento(payload);
-
     router.push("/");
   };
 
@@ -56,7 +64,7 @@ export default function NovoAgendamentoPage() {
         Novo Agendamento
       </Typography>
 
-      <Card sx={{ p: 4, mt: 2, borderRadius: 4, maxWidth: 500 }}>
+      <Card sx={{ p: 4, mt: 2, borderRadius: 4, maxWidth: 1000 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={3}>
             <TextField
@@ -65,12 +73,72 @@ export default function NovoAgendamentoPage() {
               error={!!errors.motorista}
               helperText={errors.motorista?.message}
             />
-            <TextField
-              label="Placa"
-              {...register("placa")}
-              error={!!errors.placa}
-              helperText={errors.placa?.message}
+
+            <Controller
+              name="placa"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Placa"
+                  value={field.value}
+                  onChange={(e) => {
+                    let value = e.target.value
+                      .toUpperCase()
+                      .replace(/[^A-Z0-9]/g, "");
+
+                    value = value.slice(0, 7);
+
+                    field.onChange(value);
+                  }}
+                  inputProps={{ maxLength: 7 }}
+                  error={!!errors.placa}
+                  helperText={errors.placa?.message ?? "Ex: ABC1234 ou ABC1D23"}
+                />
+              )}
             />
+
+            <Controller
+              name="cpf"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="CPF"
+                  value={field.value}
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/\D/g, "");
+                    value = value
+                      .replace(/(\d{3})(\d)/, "$1.$2")
+                      .replace(/(\d{3})(\d)/, "$1.$2")
+                      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+                    field.onChange(value);
+                  }}
+                  error={!!errors.cpf}
+                  helperText={errors.cpf?.message}
+                />
+              )}
+            />
+
+            <Controller
+              name="nascimento"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Data de Nascimento"
+                  value={field.value}
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/\D/g, "");
+                    value = value
+                      .replace(/(\d{2})(\d)/, "$1/$2")
+                      .replace(/(\d{2})(\d)/, "$1/$2")
+                      .replace(/(\d{4})(\d)/, "$1");
+                    field.onChange(value);
+                  }}
+                  error={!!errors.nascimento}
+                  helperText={errors.nascimento?.message}
+                />
+              )}
+            />
+
             <Controller
               name="horario"
               control={control}

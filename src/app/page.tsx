@@ -20,6 +20,15 @@ export default function AgendamentosPage() {
     fetchAgendamentos().then(setAgendamentos);
   }, []);
 
+  type Agendamento = {
+    id: string | number;
+    motorista: string;
+    placa: string;
+    horario: string;
+    cpf: string;
+    nascimento: string;
+  };
+
   return (
     <>
       <Typography variant="h4" color="text.primary" gutterBottom>
@@ -37,14 +46,20 @@ export default function AgendamentosPage() {
                 Motorista
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", py: 2 }}>Placa</TableCell>
+              <TableCell sx={{ fontWeight: "bold", py: 2 }}>CPF</TableCell>
+              <TableCell sx={{ fontWeight: "bold", py: 2 }}>
+                Data de Nascimento
+              </TableCell>
               <TableCell sx={{ fontWeight: "bold", py: 2 }}>Horário</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {agendamentos.map((item: any) => (
+            {agendamentos.map((item: Agendamento) => (
               <TableRow key={item.id}>
                 <TableCell>{item.motorista}</TableCell>
                 <TableCell>{item.placa}</TableCell>
+                <TableCell>{item.cpf}</TableCell>
+                <TableCell>{item.nascimento}</TableCell>
                 <TableCell>{item.horario}</TableCell>
               </TableRow>
             ))}
